@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conte-nos a Sua Experiência</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #fff;
+      font-family: 'Arial', sans-serif;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    .header {
+      background-color: white;
+      width: 100%;
+      height: 250px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      border-radius: 0 0 20px 20px;
+    }
+
+    h1 {
+      color: #ff35a8;
+      font-size: 2.5rem;
+      text-align: center;
+      margin-top: 150px;
+    }
+
+    .obs {
+      color: #ff35a8;
+      font-size: 1rem;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .status {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: green;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      width: 80%;
+      height: 50px;
+      border: 2px solid #333;
+      border-radius: 10px;
+      padding: 15px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"]::placeholder {
+      color: #333;
+    }
+
+    button {
+      background-color: #ff35a8;
+      color: white;
+      border: none;
+      padding: 15px;
+      font-size: 1.5rem;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 80%;
+    }
+
+    button:hover {
+      background-color: #e12b95;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+        margin-top: 120px;
+      }
+
+      input[type="text"] {
+        height: 40px;
+        font-size: 0.9rem;
+      }
+
+      button {
+        font-size: 1.2rem;
+        padding: 12px;
+      }
+
+      .status {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header"></div>
+
+  <h1>CONTE-NOS A SUA EXPERIÊNCIA</h1>
+  <p class="obs">OBS: SUA MENSAGEM SERÁ ANÔNIMA!</p>
+  <div class="status" id="status">Conectando...</div>
+
+  <input type="text" id="local" placeholder="Digite sua localização:" />
+  <input type="text" id="msg" placeholder="Digite o que aconteceu:" />
+  
+  <button id="sendBtn">ENVIAR</button>
+
+  <script>
+    // Conectando ao WebSocket
+    const socket = new WebSocket('wss://helix-sordid-shift.glitch.me'); // Substitua pelo seu servidor WebSocket
+    const statusDiv = document.getElementById('status');
+    const sendBtn = document.getElementById('sendBtn');
+    const msgInput = document.getElementById('msg');
+    const localInput = document.getElementById('local');
+
+    // Ao abrir a conexão
+    socket.onopen = () => {
+      statusDiv.textContent = 'CONECTADO';
+      statusDiv.style.color = 'green';
+    };
+
+    // Se a conexão fechar
+    socket.onclose = () => {
+      statusDiv.textContent = 'DESCONECTADO';
+      statusDiv.style.color = 'red';
+    };
+
+    // Em caso de erro
+    socket.onerror = (error) => {
+      statusDiv.textContent = 'ERRO NA CONEXÃO';
+      statusDiv.style.color = 'red';
+      console.error('Erro WebSocket:', error);
+    };
+
+    // Enviar mensagem ao clicar no botão
+    sendBtn.onclick = () => {
+      const local = localInput.value;
+      const msg = msgInput.value;
+      if (local && msg) {
+        const data = `Localização: ${local}, Mensagem: ${msg}`;
+        socket.send(data); // Envia a mensagem ao servidor
+        localInput.value = ''; // Limpa o campo de localização
+        msgInput.value = ''; // Limpa o campo de mensagem
+      }
+    };
+  </script>
+</body>
+</html>
